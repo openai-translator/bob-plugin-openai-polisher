@@ -16,7 +16,7 @@ function translate(query, completion) {
     if (query.detectFrom === "zh-Hant" || query.detectFrom === "zh-Hans") {
         prompt = "请润色一下这句话";
     } else {
-        prompt = "please polish this sentence";
+        prompt = "Revise the following sentence to make it more clear, concise, and coherent. Please note that you need to list the changes and briefly explain why.";
     }
     const body = {
         model: $option.model,
