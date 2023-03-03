@@ -2,6 +2,13 @@
   "identifier": "xyz.yetone.openai.polisher",
   "versions": [
     {
+      "version": "0.0.2",
+      "desc": "Support the polishing of Japanese and other languages",
+      "sha256": "1945ca77329079b550571b329461ae50933f8da70aa9d1fbe176dba288548896",
+      "url": "https://github.com/yetone/bob-plugin-openai-polisher/releases/download/v0.0.2/openai-polisher-0.0.2.bobplugin",
+      "minBobVersion": "0.5.0"
+    },
+    {
       "version": "0.0.1",
       "desc": "release v0.0.1!",
       "sha256": "0b3f7dc3f8bfcb08c090d0abd3809421172ac7e04a95c602f7bae2fa4d37160b",
