@@ -12,11 +12,25 @@ function translate(query, completion) {
         "Content-Type": "application/json",
         Authorization: `Bearer ${api_key}`,
     };
-    let prompt = "";
-    if (query.detectFrom === "zh-Hant" || query.detectFrom === "zh-Hans") {
-        prompt = "请润色一下这句话";
-    } else {
-        prompt = "Revise the following sentence to make it more clear, concise, and coherent. Please note that you need to list the changes and briefly explain why.";
+
+    let prompt = "Revise the following sentence to make it more clear, concise, and coherent. Please note that you need to list the changes and briefly explain why.";
+    switch (query.detectFrom) {
+        case "zh-Hant":
+        case "zh-Hans":
+            prompt = "请润色一下这句话";
+            break;
+        case "ja":
+            prompt = "この文章を装飾してください";
+            break;
+        case "ru":
+            prompt = "Пожалуйста, приукрасьте это предложение";
+            break;
+        case "wyw":
+            prompt = "请润色一下这句古文";
+            break;
+        case "yue":
+            prompt = "请润色一下这句粤语";
+            break;
     }
     const body = {
         model: $option.model,
@@ -30,7 +44,7 @@ function translate(query, completion) {
     if (isChatGPTModel) {
         body.messages = [
             { role: "system", content: prompt },
-            { role: "user", content: query.text },
+            { role: "user", content: `"${query.text}"` },
         ];
     } else {
         body.prompt = `${prompt}:\n\n"${query.text}" =>`;
@@ -76,13 +90,11 @@ function translate(query, completion) {
             } else {
                 targetTxt = choices[0].text.trim();
             }
-            if (!isChatGPTModel) {
-                if (targetTxt.startsWith('"')) {
-                    targetTxt = targetTxt.slice(1);
-                }
-                if (targetTxt.endsWith('"')) {
-                    targetTxt = targetTxt.slice(0, -1);
-                }
+            if (targetTxt.startsWith('"') || targetTxt.startsWith("「")) {
+                targetTxt = targetTxt.slice(1);
+            }
+            if (targetTxt.endsWith('"') || targetTxt.endsWith("」")) {
+                targetTxt = targetTxt.slice(0, -1);
             }
             completion({
                 result: {
