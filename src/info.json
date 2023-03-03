@@ -39,6 +39,22 @@
                     "value": "text-davinci-002"
                 }
             ]
+        },
+        {
+            "identifier": "polishing_mode",
+            "type": "menu",
+            "title": "润色模式",
+            "defaultValue": "simplicity",
+            "menuValues": [
+                {
+                    "title": "简洁（只输出润色后的文本）",
+                    "value": "simplicity"
+                },
+                {
+                    "title": "详尽（附加解释修改原因）",
+                    "value": "detailed"
+                },
+            ]
         }
     ]
 }

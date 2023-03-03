@@ -12,23 +12,44 @@ function translate(query, completion) {
         "Content-Type": "application/json",
         Authorization: `Bearer ${api_key}`,
     };
-    let prompt = "Revise the following sentence to make it more clear, concise, and coherent. Please note that you need to list the changes and briefly explain why.";
+    const detailedPolishingMode = $option.polishing_mode === "detailed";
+    let prompt =
+        "Revise the following sentences to make them more clear, concise, and coherent";
+    if (detailedPolishingMode) {
+        prompt = `${prompt}. Please note that you need to list the changes and briefly explain why`;
+    }
     switch (query.detectFrom) {
         case "zh-Hant":
         case "zh-Hans":
-            prompt = "请润色一下这句话";
+            prompt = "润色此句";
+            if (detailedPolishingMode) {
+                prompt = `${prompt}。请注意要列出更改以及简要解释一下为什么这么修改`;
+            }
             break;
         case "ja":
-            prompt = "この文章を装飾してください";
+            prompt = "この文章を装飾する";
+            if (detailedPolishingMode) {
+                prompt = `${prompt}。変更点をリストアップし、なぜそのように変更したかを簡単に説明することに注意してください`;
+            }
             break;
         case "ru":
-            prompt = "Пожалуйста, приукрасьте это предложение";
+            prompt =
+                "Переформулируйте следующие предложения, чтобы они стали более ясными, краткими и связными";
+            if (detailedPolishingMode) {
+                prompt = `${prompt}. Пожалуйста, обратите внимание на необходимость перечисления изменений и краткого объяснения причин таких изменений`;
+            }
             break;
         case "wyw":
-            prompt = "请润色一下这句古文";
+            prompt = "润色此句古文";
+            if (detailedPolishingMode) {
+                prompt = `${prompt}。请注意要列出更改以及简要解释一下为什么这么修改`;
+            }
             break;
         case "yue":
-            prompt = "请润色一下这句粤语";
+            prompt = "潤色呢句粵語";
+            if (detailedPolishingMode) {
+                prompt = `${prompt}。記住要列出修改嘅內容同簡單解釋下點解要做呢啲更改`;
+            }
             break;
     }
     const body = {
@@ -43,10 +64,10 @@ function translate(query, completion) {
     if (isChatGPTModel) {
         body.messages = [
             { role: "system", content: prompt },
-            { role: "user", content: `"${query.text}"` },
+            { role: "user", content: query.text },
         ];
     } else {
-        body.prompt = `${prompt}:\n\n"${query.text}" =>`;
+        body.prompt = `${prompt}:\n\n${query.text} =>`;
     }
     (async () => {
         const resp = await $http.request({
@@ -88,12 +109,6 @@ function translate(query, completion) {
                 targetTxt = choices[0].message.content.trim();
             } else {
                 targetTxt = choices[0].text.trim();
-            }
-            if (targetTxt.startsWith('"') || targetTxt.startsWith("「")) {
-                targetTxt = targetTxt.slice(1);
-            }
-            if (targetTxt.endsWith('"') || targetTxt.endsWith("」")) {
-                targetTxt = targetTxt.slice(0, -1);
             }
             completion({
                 result: {
