@@ -1,0 +1,59 @@
+name: Release
+
+on:
+  push:
+    tags: [ v\d+\.\d+\.\d+ ]
+
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Get version
+        id: get_version
+        uses: battila7/get-version-action@v2
+
+      - name: Get tag message
+        id: tag
+        run: |
+          git fetch --depth=1 origin +refs/tags/*:refs/tags/*
+          echo "message=$(git tag -l --format='%(contents:subject)' ${{ steps.get_version.outputs.version }})" >> $GITHUB_OUTPUT
+
+      - name: Change version
+        run: sed -i -e "s/0\.1\.0/${{ steps.get_version.outputs.version-without-v }}/" src/info.json
+
+      - name: Package plugin
+        run: mkdir release && zip -j -r release/openai-polisher-${{ steps.get_version.outputs.version-without-v }}.bobplugin ./src/*
+
+      - run: git checkout -- src/
+
+      - name: Update appcast.json
+        run: |
+          python3 scripts/update_appcast.py ${{ steps.get_version.outputs.version-without-v }} '${{ steps.tag.outputs.message }}'
+      
+      - name: Commit files
+        run: |
+          git config --global user.name 'yetone'
+          git config --global user.email 'yetoneful@gmail.com'
+          git add .
+          git commit -am 'update appcast.json'
+
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload binaries to release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          release_name: ${{ steps.get_version.outputs.version }}
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: release/openai-polisher-${{ steps.get_version.outputs.version-without-v }}.bobplugin
+          asset_name: openai-polisher-${{ steps.get_version.outputs.version-without-v }}.bobplugin
+          tag: ${{ github.ref }}
+          overwrite: true
+          body: ${{ steps.tag.outputs.message }}
