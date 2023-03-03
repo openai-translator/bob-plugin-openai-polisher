@@ -12,7 +12,6 @@ function translate(query, completion) {
         "Content-Type": "application/json",
         Authorization: `Bearer ${api_key}`,
     };
-
     let prompt = "Revise the following sentence to make it more clear, concise, and coherent. Please note that you need to list the changes and briefly explain why.";
     switch (query.detectFrom) {
         case "zh-Hant":
