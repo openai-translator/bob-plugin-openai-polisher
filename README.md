@@ -15,13 +15,13 @@ ChatGPT 向我们展示了 GPT 模型的伟大之处，所以我使用 ChatGPT �
 2. 下载此插件: [openai-polisher.bobplugin](https://github.com/yetone/bob-plugin-openai-polisher/releases)
 3. 安装此插件:
 
-![](https://user-images.githubusercontent.com/1206493/219937302-6be8d362-1520-4906-b8d6-284d01012837.gif)
+![](https://user-images.githubusercontent.com/1206493/222712959-4a4b27e2-b129-408a-a8af-24a3a89df2dd.gif)
 
 4. 去 [OpenAI](https://platform.openai.com/account/api-keys) 获取你的 API KEY
 5. 把 API KEY 填入 Bob 此插件配置界面的 API KEY
  输入框中
 
-![](https://user-images.githubusercontent.com/1206493/219937398-8e5bb8d2-7dc8-404a-96e7-a937e08c939f.gif)
+![](https://user-images.githubusercontent.com/1206493/222712982-5c5598b0-8560-422f-837f-3ffd08a39f81.gif)
 
 6. 安装 [PopClip](https://bobtranslate.com/guide/integration/popclip.html) 实现划词后鼠标附近出现小图标
 
