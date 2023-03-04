@@ -3,7 +3,7 @@ OpenAI Polisher Bob Plugin
 
 # 简介
 
-ChatGPT 向我们展示了 GPT 模型的伟大之处，所以我使用 ChatGPT 的 API 实现了这个用来给语言润色和修改语法错误的 Bob 插件，效果拔群！完美替代 Grammarly!
+ChatGPT 向我们展示了 GPT 模型的伟大之处，所以我使用 ChatGPT 的 API 实现了这个用来给语言润色和语法纠错的 Bob 插件，效果拔群！完美替代 Grammarly!
 
 # 使用截图
 
