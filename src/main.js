@@ -91,7 +91,7 @@ function translate(query, completion) {
                 error: {
                     type: reason,
                     message: `接口响应错误 - ${resp.data.error.message}`,
-                    addtion: JSON.stringify(resp),
+                    addition: JSON.stringify(resp),
                 },
             });
         } else {
@@ -123,7 +123,7 @@ function translate(query, completion) {
             error: {
                 type: err._type || "unknown",
                 message: err._message || "未知错误",
-                addtion: err._addtion,
+                addition: err._addition,
             },
         });
     });
