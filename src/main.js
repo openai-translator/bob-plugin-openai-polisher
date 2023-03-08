@@ -20,6 +20,11 @@ function translate(query, completion) {
     }
     switch (query.detectFrom) {
         case "zh-Hant":
+            prompt = "潤色此句";
+            if (detailedPolishingMode) {
+                prompt = `${prompt}。請列出修改項目，並簡述修改原因`;
+            }
+            break;
         case "zh-Hans":
             prompt = "润色此句";
             if (detailedPolishingMode) {
@@ -73,8 +78,8 @@ function translate(query, completion) {
         const resp = await $http.request({
             method: "POST",
             url:
-                "https://api.openai.com/v1" +
-                (isChatGPTModel ? "/chat/completions" : "/completions"),
+                $option.api_url +
+                (isChatGPTModel ? "/v1/chat/completions" : "/v1/completions"),
             header,
             body,
         });
