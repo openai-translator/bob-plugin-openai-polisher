@@ -13,8 +13,7 @@ function translate(query, completion) {
         Authorization: `Bearer ${api_key}`,
     };
     const detailedPolishingMode = $option.polishing_mode === "detailed";
-    let prompt =
-        "Revise the following sentences to make them more clear, concise, and coherent";
+    let prompt = $option.prompt;
     if (detailedPolishingMode) {
         prompt = `${prompt}. Please note that you need to list the changes and briefly explain why`;
     }

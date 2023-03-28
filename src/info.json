@@ -48,6 +48,13 @@
             ]
         },
         {
+            "identifier": "prompt",
+            "type": "text",
+            "title": "Prompt",
+            "defaultValue": "Revise the following sentences to make them more clear, concise, and coherent",
+            "desc": "通过自定义 prompt 获取不同的润色结果"
+        },
+        {
             "identifier": "polishing_mode",
             "type": "menu",
             "title": "润色模式",
