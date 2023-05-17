@@ -2,6 +2,13 @@
   "identifier": "xyz.yetone.openai.polisher",
   "versions": [
     {
+      "version": "0.1.0",
+      "desc": "Support custom prompt",
+      "sha256": "9dd8dd4d52f24df0bbf946e48f9e57cc417ef18be4bc37639fc3308aa5e7b98b",
+      "url": "https://github.com/yetone/bob-plugin-openai-polisher/releases/download/v0.1.0/openai-polisher-0.1.0.bobplugin",
+      "minBobVersion": "0.5.0"
+    },
+    {
       "version": "0.0.3",
       "desc": "Add an option to display the reason for polishing or not.",
       "sha256": "31cdc98bcd9f5bf473c67f5bc2e60da6d3f984b0ac97fdfebce981eb8504981b",
