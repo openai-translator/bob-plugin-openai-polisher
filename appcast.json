@@ -2,6 +2,13 @@
   "identifier": "xyz.yetone.openai.polisher",
   "versions": [
     {
+      "version": "0.2.0",
+      "desc": "fix(ci): add permissions",
+      "sha256": "1138da2e03ab8209722cc8bb4c7ecddb7aedc3acd77e7b3ca573400ad801e1a8",
+      "url": "https://github.com/yetone/bob-plugin-openai-polisher/releases/download/v0.2.0/openai-polisher-0.2.0.bobplugin",
+      "minBobVersion": "0.5.0"
+    },
+    {
       "version": "0.1.0",
       "desc": "Support custom prompt",
       "sha256": "9dd8dd4d52f24df0bbf946e48f9e57cc417ef18be4bc37639fc3308aa5e7b98b",
