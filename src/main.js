@@ -9,6 +9,48 @@ var ChatGPTModels = [
     "gpt-4-32k",
     "gpt-4-32k-0314",
 ];
+var HttpErrorCodes = {
+    "400": "Bad Request",
+    "401": "Unauthorized",
+    "402": "Payment Required",
+    "403": "Forbidden",
+    "404": "Not Found",
+    "405": "Method Not Allowed",
+    "406": "Not Acceptable",
+    "407": "Proxy Authentication Required",
+    "408": "Request Timeout",
+    "409": "Conflict",
+    "410": "Gone",
+    "411": "Length Required",
+    "412": "Precondition Failed",
+    "413": "Payload Too Large",
+    "414": "URI Too Long",
+    "415": "Unsupported Media Type",
+    "416": "Range Not Satisfiable",
+    "417": "Expectation Failed",
+    "418": "I'm a teapot",
+    "421": "Misdirected Request",
+    "422": "Unprocessable Entity",
+    "423": "Locked",
+    "424": "Failed Dependency",
+    "425": "Too Early",
+    "426": "Upgrade Required",
+    "428": "Precondition Required",
+    "429": "Too Many Requests",
+    "431": "Request Header Fields Too Large",
+    "451": "Unavailable For Legal Reasons",
+    "500": "Internal Server Error",
+    "501": "Not Implemented",
+    "502": "Bad Gateway",
+    "503": "Service Unavailable",
+    "504": "Gateway Timeout",
+    "505": "HTTP Version Not Supported",
+    "506": "Variant Also Negotiates",
+    "507": "Insufficient Storage",
+    "508": "Loop Detected",
+    "510": "Not Extended",
+    "511": "Network Authentication Required"
+};
 
 /**
  * @param {string}  url
@@ -94,6 +136,18 @@ function generateSystemPrompt(basePrompt, polishingMode, query) {
 }
 
 /**
+ * @param {string} prompt
+ * @param {Bob.TranslateQuery} query
+ * @returns {string}
+*/
+function replacePromptKeywords(prompt, query) {
+    if (!prompt) return prompt;
+    return prompt.replace("$text", query.text)
+        .replace("$sourceLang", query.detectFrom)
+        .replace("$targetLang", query.detectTo);
+}
+
+/**
  * @param {typeof ChatGPTModels[number]} model
  * @param {boolean} isChatGPTModel
  * @param {Bob.TranslateQuery} query
@@ -113,13 +167,14 @@ function generateSystemPrompt(basePrompt, polishingMode, query) {
 */
 function buildRequestBody(model, isChatGPTModel, query) {
     const { customSystemPrompt, customUserPrompt, polishingMode } = $option;
-
-    const systemPrompt = generateSystemPrompt(customSystemPrompt, polishingMode, query);
-    const userPrompt = customUserPrompt ? `${customUserPrompt}:\n\n"${query.text}"` : query.text;
+    
+    const systemPrompt = generateSystemPrompt(replacePromptKeywords(customSystemPrompt, query), polishingMode, query);
+    const userPrompt = customUserPrompt ? `${replacePromptKeywords(customUserPrompt, query)}:\n\n"${query.text}"` : query.text;
 
     const standardBody = {
         model,
-        temperature: 0,
+        stream: true,
+        temperature: 0.2,
         max_tokens: 1000,
         top_p: 1,
         frequency_penalty: 1,
@@ -148,52 +203,67 @@ function buildRequestBody(model, isChatGPTModel, query) {
 }
 
 /**
- * @param {Bob.Completion} completion
+ * @param {Bob.TranslateQuery} query
  * @param {Bob.HttpResponse} result
  * @returns {void}
 */
-function handleError(completion, result) {
+function handleError(query, result) {
     const { statusCode } = result.response;
     const reason = (statusCode >= 400 && statusCode < 500) ? "param" : "api";
-    completion({
+    query.onCompletion({
         error: {
             type: reason,
-            message: `接口响应错误 - ${result.data.error.message}`,
+            message: `接口响应错误 - ${HttpErrorCodes[statusCode]}`,
             addtion: JSON.stringify(result),
         },
     });
 }
 
 /**
- * @param {Bob.Completion} completion
- * @param {boolean} isChatGPTModel
  * @param {Bob.TranslateQuery} query
- * @param {Bob.HttpResponse} result
- * @returns {void}
+ * @param {boolean} isChatGPTModel
+ * @param {string} targetText
+ * @param {string} textFromResponse
+ * @returns {string}
 */
-function handleResponse(completion, isChatGPTModel, query, result) {
-    const { choices } = result.data;
+function handleResponse(query, isChatGPTModel, targetText, textFromResponse) {
+    if (textFromResponse !== '[DONE]') {
+        try {
+            const dataObj = JSON.parse(textFromResponse);
+            const { choices } = dataObj;
+            if (!choices || choices.length === 0) {
+                query.onCompletion({
+                    error: {
+                        type: "api",
+                        message: "接口未返回结果",
+                        addtion: textFromResponse,
+                    },
+                });
+                return targetText;
+            }
 
-    if (!choices || choices.length === 0) {
-        completion({
-            error: {
-                type: "api",
-                message: "接口未返回结果",
-                addtion: JSON.stringify(result),
-            },
-        });
-        return;
+            const content = isChatGPTModel ? choices[0].delta.content : choices[0].text;
+            if (content !== undefined) {
+                targetText += content;
+                query.onStream({
+                    result: {
+                        from: query.detectFrom,
+                        to: query.detectTo,
+                        toParagraphs: [targetText],
+                    },
+                });
+            }
+        } catch (err) {
+            query.onCompletion({
+                error: {
+                    type: err._type || "param",
+                    message: err._message || "Failed to parse JSON",
+                    addtion: err._addition,
+                },
+            });
+        }
     }
-
-    let targetText = (isChatGPTModel ? choices[0].message.content : choices[0].text).trim();
-
-    completion({
-        result: {
-            from: query.detectFrom,
-            to: query.detectTo,
-            toParagraphs: targetText.split("\n"),
-        },
-    });
+    return targetText;
 }
 
 /**
@@ -249,19 +319,49 @@ function translate(query, completion) {
     const header = buildHeader(isAzureServiceProvider, apiKey);
     const body = buildRequestBody(model, isChatGPTModel, query);
 
+    // 初始化拼接结果变量
+    let targetText = "";
     (async () => {
-        const result = await $http.request({
+        await $http.streamRequest({
             method: "POST",
             url: modifiedApiUrl + apiUrlPath,
             header,
             body,
+            cancelSignal: query.cancelSignal,
+            streamHandler: (streamData) => {
+                if (streamData.text.includes("Invalid token")) {
+                    query.onCompletion({
+                        error: {
+                            type: "secretKey",
+                            message: "配置错误 - 请确保您在插件配置中填入了正确的 API Keys",
+                            addtion: "请在插件配置中填写正确的 API Keys",
+                        },
+                    });
+                } else {
+                    const lines = streamData.text.split('\n').filter(line => line);
+                    lines.forEach(line => {
+                        const match = line.match(/^data: (.*)/);
+                        if (match) {
+                            const textFromResponse = match[1].trim();
+                            targetText = handleResponse(query, isChatGPTModel, targetText, textFromResponse);
+                        }
+                    });
+                }
+            },
+            handler: (result) => {
+                if (result.response.statusCode >= 400) {
+                    handleError(query, result);
+                } else {
+                    query.onCompletion({
+                        result: {
+                            from: query.detectFrom,
+                            to: query.detectTo,
+                            toParagraphs: [targetText],
+                        },
+                    });
+                }
+            }
         });
-
-        if (result.error) {
-            handleError(completion, result);
-        } else {
-            handleResponse(completion, isChatGPTModel, query, result);
-        }
     })().catch((err) => {
         completion({
             error: {

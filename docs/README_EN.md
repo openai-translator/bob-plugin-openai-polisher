@@ -35,7 +35,7 @@ ChatGPT has shown us the greatness of the GPT model, so I used ChatGPT's API to 
 
 ## Usage
 
-1. Install [Bob](https://bobtranslate.com/guide/#%E5%AE%89%E8%A3%85) (version >= 0.50), a macOS translation and OCR software
+1. Install [Bob](https://bobtranslate.com/guide/#%E5%AE%89%E8%A3%85), a translation and OCR software for macOS platform; [openai-translator.bobplugin](https://github.com/yetone/bob-plugin-openai-translator/releases/latest) >= **1.0.0** enables streaming output by default after installation, requiring Bob version >= **1.8.0**.
 
 2. Download this plugin: [openai-polisher.bobplugin](https://github.com/openai-translator/bob-plugin-openai-polisher/releases/latest)
 
