@@ -2,6 +2,13 @@
   "identifier": "xyz.yetone.openai.polisher",
   "versions": [
     {
+      "version": "1.1.0",
+      "desc": "Handle fragmented stream data from OpenAI API",
+      "sha256": "2cefc695cb1ab9f8b2b93440d105a6f0fcbadc0198a0d785cd1d9920bd3f3fbf",
+      "url": "https://github.com/yetone/bob-plugin-openai-polisher/releases/download/v1.1.0/openai-polisher-1.1.0.bobplugin",
+      "minBobVersion": "1.8.0"
+    },
+    {
       "version": "1.0.0",
       "desc": "Supports streaming output, requires Bob version >= 1.8.0",
       "sha256": "e540344dfd152d40779455301cc38750fdcf8db2e3d3e2f7ef89329d607be3c2",
