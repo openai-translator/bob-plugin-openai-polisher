@@ -84,52 +84,50 @@ function buildHeader(isAzureServiceProvider, apiKey) {
  * @param {"simplicity" | "detailed"} polishingMode
  * @param {Bob.TranslateQuery} query
  * @returns {string}
-*/
+ */
 function generateSystemPrompt(basePrompt, polishingMode, query) {
-    let systemPrompt = basePrompt || "Revise the following sentences to make them more clear, concise, and coherent.";
-
     const isDetailedPolishingMode = polishingMode === "detailed";
+    const languageMapping = {
+        "zh-Hant": {
+            prompt: "潤色此句",
+            detailed: "。請列出修改項目，並簡述修改原因",
+        },
+        "zh-Hans": {
+            prompt: "润色此句",
+            detailed: "。请注意要列出更改以及简要解释一下为什么这么修改",
+        },
+        "ja": {
+            prompt: "この文章を装飾する",
+            detailed: "。変更点をリストアップし、なぜそのように変更したかを簡単に説明することに注意してください",
+        },
+        "ru": {
+            prompt: "Переформулируйте следующие предложения, чтобы они стали более ясными, краткими и связными",
+            detailed:
+            ". Пожалуйста, обратите внимание на необходимость перечисления изменений и краткого объяснения причин таких изменений",
+        },
+        "wyw": {
+            prompt: "润色此句古文",
+            detailed: "。请注意要列出更改以及简要解释一下为什么这么修改",
+        },
+        "yue": {
+            prompt: "潤色呢句粵語",
+            detailed: "。記住要列出修改嘅內容同簡單解釋下點解要做呢啲更改",
+        },
+    };
+
+    const defaultMessage =
+        "Revise the following sentences to make them more clear, concise, and coherent.";
+    let systemPrompt = basePrompt || defaultMessage;
+
     if (isDetailedPolishingMode) {
-        systemPrompt = `${systemPrompt}. Please note that you need to list the changes and briefly explain why`;
+        systemPrompt += ". Please note that you need to list the changes and briefly explain why";
     }
-    switch (query.detectFrom) {
-        case "zh-Hant":
-            systemPrompt = "潤色此句";
-            if (isDetailedPolishingMode) {
-                systemPrompt = `${systemPrompt}。請列出修改項目，並簡述修改原因`;
-            }
-            break;
-        case "zh-Hans":
-            systemPrompt = "润色此句";
-            if (isDetailedPolishingMode) {
-                systemPrompt = `${systemPrompt}。请注意要列出更改以及简要解释一下为什么这么修改`;
-            }
-            break;
-        case "ja":
-            systemPrompt = "この文章を装飾する";
-            if (isDetailedPolishingMode) {
-                systemPrompt = `${systemPrompt}。変更点をリストアップし、なぜそのように変更したかを簡単に説明することに注意してください`;
-            }
-            break;
-        case "ru":
-            systemPrompt =
-                "Переформулируйте следующие предложения, чтобы они стали более ясными, краткими и связными";
-            if (isDetailedPolishingMode) {
-                systemPrompt = `${systemPrompt}. Пожалуйста, обратите внимание на необходимость перечисления изменений и краткого объяснения причин таких изменений`;
-            }
-            break;
-        case "wyw":
-            systemPrompt = "润色此句古文";
-            if (isDetailedPolishingMode) {
-                systemPrompt = `${systemPrompt}。请注意要列出更改以及简要解释一下为什么这么修改`;
-            }
-            break;
-        case "yue":
-            systemPrompt = "潤色呢句粵語";
-            if (isDetailedPolishingMode) {
-                systemPrompt = `${systemPrompt}。記住要列出修改嘅內容同簡單解釋下點解要做呢啲更改`;
-            }
-            break;
+
+    if (Object.prototype.hasOwnProperty.call(languageMapping, query.detectFrom)) {
+        systemPrompt = basePrompt || languageMapping[query.detectFrom].prompt;
+        if (isDetailedPolishingMode) {
+        systemPrompt += languageMapping[query.detectFrom].detailed;
+        }
     }
 
     return systemPrompt;
