@@ -2,6 +2,13 @@
   "identifier": "xyz.yetone.openai.polisher",
   "versions": [
     {
+      "version": "1.2.0",
+      "desc": "Fix invalid custom system prompt",
+      "sha256": "26d21851dcf5af88e44768d524874932c099238f91ae4114ddf78f80caf090ad",
+      "url": "https://github.com/yetone/bob-plugin-openai-polisher/releases/download/v1.2.0/openai-polisher-1.2.0.bobplugin",
+      "minBobVersion": "1.8.0"
+    },
+    {
       "version": "1.1.0",
       "desc": "Handle fragmented stream data from OpenAI API",
       "sha256": "2cefc695cb1ab9f8b2b93440d105a6f0fcbadc0198a0d785cd1d9920bd3f3fbf",
