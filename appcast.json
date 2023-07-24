@@ -2,6 +2,13 @@
   "identifier": "xyz.yetone.openai.polisher",
   "versions": [
     {
+      "version": "1.2.2",
+      "desc": "优化 HTTP Error 429 的错误信息",
+      "sha256": "25c10ebdd3133c37407740511f096a171d5219ad0d35c84d5bb00bf81bc205aa",
+      "url": "https://github.com/yetone/bob-plugin-openai-polisher/releases/download/v1.2.2/openai-polisher-1.2.2.bobplugin",
+      "minBobVersion": "1.8.0"
+    },
+    {
       "version": "1.2.1",
       "desc": "Supports the latest GPT-4 and 3.5 Turbo models",
       "sha256": "efd43255e1014e92405fb1521c4d61fea4d50f8fb6a00a292790a49b1102420a",
