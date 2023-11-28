@@ -2,6 +2,13 @@
   "identifier": "xyz.yetone.openai.polisher",
   "versions": [
     {
+      "version": "2.0.0",
+      "desc": "Support for custom models, drop of support for `v1/completions`",
+      "sha256": "520985c6b10de2ae55651ddc94f5123fe9655ceb3962a276fd814ebad2facc2f",
+      "url": "https://github.com/yetone/bob-plugin-openai-polisher/releases/download/v2.0.0/openai-polisher-2.0.0.bobplugin",
+      "minBobVersion": "1.8.0"
+    },
+    {
       "version": "1.2.2",
       "desc": "优化 HTTP Error 429 的错误信息",
       "sha256": "25c10ebdd3133c37407740511f096a171d5219ad0d35c84d5bb00bf81bc205aa",
