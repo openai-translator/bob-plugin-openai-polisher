@@ -214,13 +214,7 @@ declare namespace Bob {
 
   // https://ripperhe.gitee.io/bob/#/plugin/api/option
   type Option = {
-    apiKeys: string;
-    apiUrl: string;
-    customSystemPrompt: string;
-    customUserPrompt: string;
-    deploymentName: string;
-    model: string;
-    polishingMode: "simplicity" | "detailed";
+    [propName: string]: string;
   };
 
 

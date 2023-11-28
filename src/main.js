@@ -1,18 +1,6 @@
 //@ts-check
 
 var lang = require("./lang.js");
-var ChatGPTModels = [
-    "gpt-3.5-turbo",
-    "gpt-3.5-turbo-16k",
-    "gpt-3.5-turbo-0301",
-    "gpt-3.5-turbo-0613",
-    "gpt-4",
-    "gpt-4-0314",
-    "gpt-4-0613",
-    "gpt-4-32k",
-    "gpt-4-32k-0314",
-    "gpt-4-32k-0613",
-];
 var HttpErrorCodes = {
     "400": "Bad Request",
     "401": "Unauthorized",
@@ -85,7 +73,7 @@ function buildHeader(isAzureServiceProvider, apiKey) {
 
 /**
  * @param {string} basePrompt
- * @param {"simplicity" | "detailed"} polishingMode
+ * @param {string} polishingMode
  * @param {Bob.TranslateQuery} query
  * @returns {string}
  */
@@ -150,11 +138,10 @@ function replacePromptKeywords(prompt, query) {
 }
 
 /**
- * @param {typeof ChatGPTModels[number]} model
- * @param {boolean} isChatGPTModel
+ * @param {string} model
  * @param {Bob.TranslateQuery} query
  * @returns {{ 
- *  model: typeof ChatGPTModels[number];
+ *  model: string;
  *  temperature: number;
  *  max_tokens: number;
  *  top_p: number;
@@ -167,14 +154,14 @@ function replacePromptKeywords(prompt, query) {
  *  prompt?: string;
  * }}
 */
-function buildRequestBody(model, isChatGPTModel, query) {
+function buildRequestBody(model, query) {
     const { customSystemPrompt, customUserPrompt, polishingMode } = $option;
     
     const systemPrompt = generateSystemPrompt(replacePromptKeywords(customSystemPrompt, query), polishingMode, query);
     const userPrompt = customUserPrompt ? `${replacePromptKeywords(customUserPrompt, query)}:\n\n"${query.text}"` : query.text;
 
     const standardBody = {
-        model,
+        model: model,
         stream: true,
         temperature: 0.2,
         max_tokens: 1000,
@@ -183,24 +170,19 @@ function buildRequestBody(model, isChatGPTModel, query) {
         presence_penalty: 1,
     };
 
-    if (isChatGPTModel) {
-        return {
-            ...standardBody,
-            messages: [
-                {
-                    role: "system",
-                    content: systemPrompt,
-                },
-                {
-                    role: "user",
-                    content: userPrompt,
-                },
-            ],
-        };
-    }
     return {
         ...standardBody,
-        prompt: `${systemPrompt}\n\n${userPrompt}`,
+        model: model,
+        messages: [
+            {
+                role: "system",
+                content: systemPrompt,
+            },
+            {
+                role: "user",
+                content: userPrompt,
+            },
+        ],
     };
 }
 
@@ -223,12 +205,11 @@ function handleError(query, result) {
 
 /**
  * @param {Bob.TranslateQuery} query
- * @param {boolean} isChatGPTModel
  * @param {string} targetText
  * @param {string} textFromResponse
  * @returns {string}
 */
-function handleResponse(query, isChatGPTModel, targetText, textFromResponse) {
+function handleResponse(query, targetText, textFromResponse) {
     if (textFromResponse !== '[DONE]') {
         try {
             const dataObj = JSON.parse(textFromResponse);
@@ -244,7 +225,7 @@ function handleResponse(query, isChatGPTModel, targetText, textFromResponse) {
                 return targetText;
             }
 
-            const content = isChatGPTModel ? choices[0].delta.content : choices[0].text;
+            const content = choices[0].delta.content;
             if (content !== undefined) {
                 targetText += content;
                 query.onStream({
@@ -282,7 +263,18 @@ function translate(query, completion) {
         });
     }
 
-    const { model, apiKeys, apiUrl, deploymentName } = $option;
+    const { model, customModel, apiKeys, apiVersion, apiUrl, deploymentName } = $option;
+
+    const isCustomModelRequired = model === "custom";
+    if (isCustomModelRequired && !customModel) {
+        query.onCompletion({
+            error: {
+                type: "param",
+                message: "配置错误 - 请确保您在插件配置中填入了正确的自定义模型名称",
+                addtion: "请在插件配置中填写自定义模型名称",
+            },
+        }); 
+    }
 
     if (!apiKeys) {
         completion({
@@ -293,20 +285,22 @@ function translate(query, completion) {
             },
         });
     }
+
+    const modelValue = isCustomModelRequired ? customModel : model;
+
     const trimmedApiKeys = apiKeys.endsWith(",") ? apiKeys.slice(0, -1) : apiKeys;
     const apiKeySelection = trimmedApiKeys.split(",").map(key => key.trim());
     const apiKey = apiKeySelection[Math.floor(Math.random() * apiKeySelection.length)];
 
     const modifiedApiUrl = ensureHttpsAndNoTrailingSlash(apiUrl || "https://api.openai.com");
     
-    const isChatGPTModel = ChatGPTModels.includes(model);
     const isAzureServiceProvider = modifiedApiUrl.includes("openai.azure.com");
-    let apiUrlPath = isChatGPTModel ? "/v1/chat/completions" : "/v1/completions";
+    let apiUrlPath =  "/v1/chat/completions";
+    const apiVersionQuery = apiVersion ? `?api-version=${apiVersion}` : "?api-version=2023-03-15-preview";
     
     if (isAzureServiceProvider) {
         if (deploymentName) {
-            apiUrlPath = `/openai/deployments/${deploymentName}`;
-            apiUrlPath += isChatGPTModel ? "/chat/completions?api-version=2023-03-15-preview" : "/completions?api-version=2022-12-01";
+            apiUrlPath = `/openai/deployments/${deploymentName}/chat/completions${apiVersionQuery}`;
         } else {
             completion({
                 error: {
@@ -319,7 +313,7 @@ function translate(query, completion) {
     }
 
     const header = buildHeader(isAzureServiceProvider, apiKey);
-    const body = buildRequestBody(model, isChatGPTModel, query);
+    const body = buildRequestBody(modelValue, query);
 
     let targetText = ""; // 初始化拼接结果变量
     let buffer = ""; // 新增 buffer 变量
@@ -348,7 +342,7 @@ function translate(query, completion) {
                         if (match) {
                             // 如果是一个完整的消息，处理它并从缓冲变量中移除
                             const textFromResponse = match[1].trim();
-                            targetText = handleResponse(query, isChatGPTModel, targetText, textFromResponse);
+                            targetText = handleResponse(query, targetText, textFromResponse);
                             buffer = buffer.slice(match[0].length);
                         } else {
                             // 如果没有完整的消息，等待更多的数据
