@@ -37,7 +37,7 @@ ChatGPT 向我们展示了 GPT 模型的伟大之处，所以我使用 ChatGPT �
 
 1. 安装 [Bob](https://bobtranslate.com/guide/#%E5%AE%89%E8%A3%85)，一款 macOS 平台的翻译和 OCR 软件；[openai-translator.bobplugin](https://github.com/yetone/bob-plugin-openai-translator/releases/latest) >= **1.0.0** 以后默认开启流式输出，需要 Bob 版本 >= **1.8.0**
 
-2. 下载此插件: [openai-polisher.bobplugin](https://github.com/yetone/bob-plugin-openai-polisher/releases)
+2. 下载此插件: [openai-polisher.bobplugin](https://github.com/openai-translator/bob-plugin-openai-polisher/releases)
 
 3. 安装此插件:
   ![安装步骤](https://user-images.githubusercontent.com/1206493/222712959-4a4b27e2-b129-408a-a8af-24a3a89df2dd.gif)
@@ -54,9 +54,3 @@ ChatGPT 向我们展示了 GPT 模型的伟大之处，所以我使用 ChatGPT �
 
 我这只是个小小的 Bob 插件，强大的是 Bob 本身，向它的开发者 [ripperhe](https://github.com/ripperhe) 致敬！
 
-### 请作者喝一杯咖啡
-
-<div align="center">
-  <img height="360" src="https://user-images.githubusercontent.com/1206493/220753437-90e4039c-d95f-4b6a-9a08-b3d6de13211f.png" />
-  <img height="360" src="https://user-images.githubusercontent.com/1206493/220756036-d9ac4512-0375-4a32-8c2e-8697021058a2.png" />
-</div>

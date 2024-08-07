@@ -6,8 +6,8 @@
   "summary": "GPT powered polisher",
   "icon": "",
   "author": "yetone <yetoneful@gmail.com>",
-  "homepage": "https://github.com/yetone/bob-plugin-openai-polisher",
-  "appcast": "https://raw.githubusercontent.com/yetone/bob-plugin-openai-polisher/main/appcast.json",
+  "homepage": "https://github.com/openai-translator/bob-plugin-openai-polisher",
+  "appcast": "https://raw.githubusercontent.com/openai-translator/bob-plugin-openai-polisher/main/appcast.json",
   "minBobVersion": "1.8.0",
   "options": [
     {
@@ -56,51 +56,35 @@
       "identifier": "model",
       "type": "menu",
       "title": "模型",
-      "defaultValue": "gpt-3.5-turbo-0613",
+      "defaultValue": "gpt-3.5-turbo",
       "menuValues": [
         {
-          "title": "custom",
+          "title": "Custom",
           "value": "custom"
         },
         {
-          "title": "gpt-3.5-turbo-0613 (recommended)",
-          "value": "gpt-3.5-turbo-0613"
-        },
-        {
-          "title": "gpt-3.5-turbo-0301",
-          "value": "gpt-3.5-turbo-0301"
-        },
-        {
-          "title": "gpt-3.5-turbo-16k",
-          "value": "gpt-3.5-turbo-16k"
-        },
-        {
-          "title": "gpt-3.5-turbo",
+          "title": "GPT-3.5 Turbo",
           "value": "gpt-3.5-turbo"
         },
         {
-          "title": "gpt-4",
+          "title": "GPT-4",
           "value": "gpt-4"
         },
         {
-          "title": "gpt-4-0314",
-          "value": "gpt-4-0314"
+          "title": "GPT-4o",
+          "value": "gpt-4o"
         },
         {
-          "title": "gpt-4-0613",
-          "value": "gpt-4-0613"
+          "title": "GPT-4o mini",
+          "value": "gpt-4o-mini"
         },
         {
-          "title": "gpt-4-32k",
+          "title": "GPT-4 Turbo",
+          "value": "gpt-4-turbo"
+        },
+        {
+          "title": "GPT-4 32K",
           "value": "gpt-4-32k"
-        },
-        {
-          "title": "gpt-4-32k-0314",
-          "value": "gpt-4-32k-0314"
-        },
-        {
-          "title": "gpt-4-32k-0613",
-          "value": "gpt-4-32k-0613"
         }
       ]
     },
@@ -147,6 +131,22 @@
           "$targetLang"
         ]
       }
+    },
+    {
+      "identifier": "stream",
+      "type": "menu",
+      "title": "流式输出",
+      "defaultValue": "1",
+      "menuValues": [
+        {
+          "title": "Enable",
+          "value": "1"
+        },
+        {
+          "title": "Disable",
+          "value": "0"
+        }
+      ]
     },
     {
       "identifier": "polishingMode",
