@@ -10,6 +10,9 @@
     "skipLibCheck": true,
     "strict": true,
     "target": "ES5",
+    "types": [
+      "@bob-translate/types"
+    ],
     "useDefineForClassFields": false,
   },
   "exclude": [

@@ -1,10 +1,15 @@
+import type {
+  HttpResponse,
+  PluginValidate,
+  ServiceError,
+  TextTranslate,
+  TextTranslateQuery
+} from "@bob-translate/types";
 import { DEFAULT_PROMPT, languageMapping } from "./const";
 import { langMap, supportLanguageList } from "./lang";
 import type {
-  BobHttpResponse,
-  BobServiceError,
-  BobTranslateQuery,
-  BobValidateCompletion,
+  ChatCompletion,
+  ModelList,
   PolishingMode,
 } from "./types";
 import {
@@ -16,11 +21,9 @@ import {
   replacePromptKeywords
 } from "./utils";
 
-function pluginTimeoutInterval() {
-  return 60;
-}
+const pluginTimeoutInterval = () => 60;
 
-function pluginValidate(completion: BobValidateCompletion) {
+const pluginValidate: PluginValidate = (completion) => {
   const { apiKeys, apiUrl, deploymentName } = $option;
   if (!apiKeys) {
     handleValidateError(completion, {
@@ -68,17 +71,20 @@ function pluginValidate(completion: BobValidateCompletion) {
           max_tokens: 5
         },
         handler: function (resp) {
-          if (resp.data.error) {
+          const data = resp.data as {
+            error: string;
+          }
+          if (data.error) {
             const { statusCode } = resp.response;
             const reason = (statusCode >= 400 && statusCode < 500) ? "param" : "api";
             handleValidateError(completion, {
               type: reason,
-              message: resp.data.error,
+              message: data.error,
               troubleshootingLink: "https://bobtranslate.com/service/translate/azureopenai.html"
             });
             return;
           }
-          if (resp.data.choices.length > 0) {
+          if ((resp.data as ChatCompletion).choices.length > 0) {
             completion({
               result: true,
             })
@@ -91,17 +97,20 @@ function pluginValidate(completion: BobValidateCompletion) {
         url: baseUrl + apiUrlPath,
         header: header,
         handler: function (resp) {
-          if (resp.data.error) {
+          const data = resp.data as {
+            error: string;
+          }
+          if (data.error) {
             const { statusCode } = resp.response;
             const reason = (statusCode >= 400 && statusCode < 500) ? "param" : "api";
             handleValidateError(completion, {
               type: reason,
-              message: resp.data.error,
+              message: data.error,
               troubleshootingLink: "https://bobtranslate.com/service/translate/openai.html"
             });
             return;
           }
-          const modelList = resp.data
+          const modelList = resp.data as ModelList;
           if (modelList.data?.length > 0) {
             completion({
               result: true,
@@ -119,20 +128,20 @@ function supportLanguages() {
   return supportLanguageList.map(([standardLang]) => standardLang);
 }
 
-function isBobServiceError(error: unknown): error is BobServiceError {
+const isServiceError = (error: unknown): error is ServiceError => {
   return (
     typeof error === 'object' &&
     error !== null &&
     'message' in error &&
-    typeof (error as BobServiceError).message === 'string'
+    typeof (error as ServiceError).message === 'string'
   );
 }
 
-function generateSystemPrompt(
+const generateSystemPrompt = (
   basePrompt: string | null,
   polishingMode: PolishingMode,
-  query: BobTranslateQuery
-): string {
+  query: TextTranslateQuery
+): string => {
   const isDetailedPolishingMode = polishingMode === "detailed";
 
   const promptInfo = languageMapping[query.detectFrom] || {
@@ -148,15 +157,15 @@ function generateSystemPrompt(
   return systemPrompt;
 }
 
-function buildRequestBody(
+const buildRequestBody = (
   model: string,
-  query: BobTranslateQuery
-) {
+  query: TextTranslateQuery
+) => {
   const { customSystemPrompt, customUserPrompt, polishingMode } = $option;
 
   const systemPrompt = generateSystemPrompt(
     replacePromptKeywords(customSystemPrompt, query),
-    polishingMode,
+    polishingMode as PolishingMode,
     query
   );
 
@@ -189,7 +198,11 @@ function buildRequestBody(
   };
 }
 
-function handleStreamResponse(query: BobTranslateQuery, targetText: string, textFromResponse: string) {
+const handleStreamResponse = (
+  query: TextTranslateQuery,
+  targetText: string,
+  textFromResponse: string
+) => {
   if (textFromResponse !== '[DONE]') {
     try {
       const dataObj = JSON.parse(textFromResponse);
@@ -207,7 +220,7 @@ function handleStreamResponse(query: BobTranslateQuery, targetText: string, text
         });
       }
     } catch (error) {
-      if (isBobServiceError(error)) {
+      if (isServiceError(error)) {
         handleGeneralError(query, {
           type: error.type || 'param',
           message: error.message || 'Failed to parse JSON',
@@ -224,8 +237,8 @@ function handleStreamResponse(query: BobTranslateQuery, targetText: string, text
   return targetText;
 }
 
-function handleGeneralResponse(query: BobTranslateQuery, result: BobHttpResponse) {
-  const { choices } = result.data;
+const handleGeneralResponse = (query: TextTranslateQuery, result: HttpResponse) => {
+  const { choices } = result.data as ChatCompletion;
 
   if (!choices || choices.length === 0) {
     handleGeneralError(query, {
@@ -236,13 +249,13 @@ function handleGeneralResponse(query: BobTranslateQuery, result: BobHttpResponse
     return;
   }
 
-  let targetText = choices[0].message.content.trim();
+  let targetText = choices[0].message.content?.trim();
 
   // 使用正则表达式删除字符串开头和结尾的特殊字符
-  targetText = targetText.replace(/^(『|「|"|“)|(』|」|"|”)$/g, "");
+  targetText = targetText?.replace(/^(『|「|"|“)|(』|」|"|”)$/g, "");
 
   // 判断并删除字符串末尾的 `" =>`
-  if (targetText.endsWith('" =>')) {
+  if (targetText?.endsWith('" =>')) {
     targetText = targetText.slice(0, -4);
   }
 
@@ -250,12 +263,12 @@ function handleGeneralResponse(query: BobTranslateQuery, result: BobHttpResponse
     result: {
       from: query.detectFrom,
       to: query.detectTo,
-      toParagraphs: targetText.split("\n"),
+      toParagraphs: targetText!.split("\n"),
     },
   });
 }
 
-function translate(query: BobTranslateQuery) {
+const translate: TextTranslate = (query) => {
   if (!langMap.get(query.detectTo)) {
     handleGeneralError(query, {
       type: "unsupportedLanguage",
