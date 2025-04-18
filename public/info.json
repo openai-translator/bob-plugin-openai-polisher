@@ -56,35 +56,31 @@
       "identifier": "model",
       "type": "menu",
       "title": "模型",
-      "defaultValue": "gpt-3.5-turbo",
+      "defaultValue": "gpt-4.1-nano",
       "menuValues": [
         {
           "title": "Custom",
           "value": "custom"
         },
         {
-          "title": "GPT-3.5 Turbo",
-          "value": "gpt-3.5-turbo"
+          "title": "GPT-4.1",
+          "value": "gpt-4.1"
         },
         {
-          "title": "GPT-4",
-          "value": "gpt-4"
+          "title": "GPT-4.1 mini",
+          "value": "gpt-4.1-mini"
+        },
+        {
+          "title": "GPT-4.1 nano",
+          "value": "gpt-4.1-nano"
         },
         {
           "title": "GPT-4o",
           "value": "gpt-4o"
         },
         {
-          "title": "GPT-4o mini",
-          "value": "gpt-4o-mini"
-        },
-        {
-          "title": "GPT-4 Turbo",
-          "value": "gpt-4-turbo"
-        },
-        {
-          "title": "GPT-4 32K",
-          "value": "gpt-4-32k"
+          "title": "o4-mini",
+          "value": "o4-mini"
         }
       ]
     },

@@ -88,6 +88,11 @@ interface Model {
   owned_by: string;
 }
 
+export interface LanguagePrompt {
+  prompt: string;
+  detailed: string;
+}
+
 export interface ModelList {
   object: string,
   data: Model[]
