@@ -2,6 +2,13 @@
   "identifier": "xyz.yetone.openai.polisher",
   "versions": [
     {
+      "version": "3.0.1",
+      "desc": "Update model options",
+      "sha256": "d406228bbfb8b64fb42d1a29407f14ad60c202a4efb089d231f3d3f128f28d2f",
+      "url": "https://github.com/openai-translator/bob-plugin-openai-polisher/releases/download/v3.0.1/openai-polisher-3.0.1.bobplugin",
+      "minBobVersion": "1.8.0"
+    },
+    {
       "version": "3.0.0",
       "desc": "Refactor OpenAI Polisher Bob Plugin to improve performance and maintainability",
       "sha256": "ba3fe4a954e57c4754e09bcf17adba40de205bfa35b4ac341277c231fca4b336",

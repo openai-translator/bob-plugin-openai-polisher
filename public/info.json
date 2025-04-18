@@ -1,6 +1,6 @@
 {
   "identifier": "xyz.yetone.openai.polisher",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "category": "translate",
   "name": "OpenAI Polisher",
   "summary": "GPT powered polisher",
