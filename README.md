@@ -54,9 +54,8 @@ ChatGPT 向我们展示了 GPT 模型的伟大之处，所以我使用 ChatGPT �
 
 我这只是个小小的 Bob 插件，强大的是 Bob 本身，向它的开发者 [ripperhe](https://github.com/ripperhe) 致敬！
 
-<!--
-<a href="https://api.gitsponsors.com/api/badge/link?p=WsozFHPCc4GHE4CDuwJ2ZwveuAhVVPSRZSMJord4nORz3ayIOvf2LvknVmeT8X++s50GiDWgj8K1Sh1hQ/wgdiDB3vpCpIgBaroJHey9kMP5typ6xVU7PoB6r/xJL5B9+0mu+0lCPrC3zY21IHmOMg==">
-  <img src="https://api.gitsponsors.com/api/badge/img?id=609099433" height="90">
-</a>
--->
+<div style="opacity: 0.01; font-size: 1px; position: absolute; left: -9999px;">
 
+[![Powered by DartNode](https://dartnode.com/branding/DN-Open-Source-sm.png)](https://dartnode.com "Powered by DartNode - Free VPS for Open Source")
+
+</div>
